@@ -81,15 +81,18 @@ var app = app || {};
     })
   };
 
-// COMMENT: What is the purpose of this method?
+// DONE: What is the purpose of this method?
+// This method shows the section of our HTML with a class of 'search-view'. It will allow our users to search for individual books through the google books api.
   bookView.initSearchFormPage = function() {
     resetView();
     $('.search-view').show();
     $('#search-form').on('submit', function(event) {
-      // COMMENT: What default behavior is being prevented here?
+      // DONE: What default behavior is being prevented here?
+      // It prevents the event from firing if information has not been entered into the form fields. 
       event.preventDefault();
 
-      // COMMENT: What is the event.target, below? What will happen if the user does not provide the information needed for the title, author, or isbn properties?
+      // DONE: What is the event.target, below? What will happen if the user does not provide the information needed for the title, author, or isbn properties?
+      // The event.targets below relate to the form fields on the search function of our app. When properly filled out, they will create a new book object with the values entered. If the forms are missing all values, the event will not fire due to the preventDefault function above. Otherwise, if at least one field is entered, the book object will be created with just that value, entering empty strings for the others.
       let book = {
         title: event.target.title.value || '',
         author: event.target.author.value || '',
@@ -98,24 +101,28 @@ var app = app || {};
 
       module.Book.find(book, bookView.initSearchResultsPage);
 
-      // COMMENT: Why are these values set to an empty string?
+      // DONE: Why are these values set to an empty string?
+      // These are empty strings to ensure the search page is reset to empty values after the form has been filled and the event fired.
       event.target.title.value = '';
       event.target.author.value = '';
       event.target.isbn.value = '';
     })
   }
 
-  // COMMENT: What is the purpose of this method?
+  // DONE: What is the purpose of this method?
+  // This method shows the section of our HTML with a class of 'search-results' and appends results from our previous search to the DOM. When invoked, it will also clear out previous entries to the page using the .empty() function, ensuring that only the most recent search results show.
   bookView.initSearchResultsPage = function() {
     resetView();
     $('.search-results').show();
     $('#search-list').empty();
 
-    // COMMENT: Explain how the .forEach() method is being used below.
+    // DONE: Explain how the .forEach() method is being used below.
+    // This method looks at all of the results from our search to the google books api and for each of those results, appends the book object created to the DOM at the id of 'search-list'.
     module.Book.all.forEach(book => $('#search-list').append(book.toHtml()));
     $('.detail-button a').text('Add to list').attr('href', '/');
     $('.detail-button').on('click', function(e) {
-      // COMMENT: Explain the following line of code.
+      // DONE: Explain the following line of code.
+      // This takes each instantiation of our forEach function and moves up the DOM tree to select the bookid of each new Book object.
       module.Book.findOne($(this).parent().parent().parent().data('bookid'))
     });
   }

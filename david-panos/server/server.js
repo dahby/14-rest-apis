@@ -12,7 +12,8 @@ const PORT = process.env.PORT;
 const CLIENT_URL = process.env.CLIENT_URL;
 const TOKEN = process.env.TOKEN;
 
-// COMMENT: Explain the following line of code. What is the API_KEY? Where did it come from?
+// DONE: Explain the following line of code. What is the API_KEY? Where did it come from?
+// We are setting the variable 'API_KEY' to our unique api key that is used to access the google books api. We are able to create our unique key for our login through the google developers page and we set it as an environment variable in the terminal.
 const API_KEY = process.env.GOOGLE_API_KEY;
 
 // Database Setup
@@ -29,25 +30,27 @@ app.get('/api/v1/admin', (req, res) => res.send(TOKEN === parseInt(req.query.tok
 app.get('/api/v1/books/find', (req, res) => {
   let url = 'https://www.googleapis.com/books/v1/volumes';
 
-  // COMMENT: Explain the following four lines of code. How is the query built out? What information will be used to create the query?
+  // DONE: Explain the following four lines of code. How is the query built out? What information will be used to create the query?
+  // It creates a blank query then fills in each field depending on if there is content for it, placing a title in there if there is a title in the query, then the same for author, then the same for isbn.
   let query = ''
   if(req.query.title) query += `+intitle:${req.query.title}`;
   if(req.query.author) query += `+inauthor:${req.query.author}`;
   if(req.query.isbn) query += `+isbn:${req.query.isbn}`;
 
-  // COMMENT: What is superagent? How is it being used here? What other libraries are available that could be used for the same purpose?
+  // DONE: What is superagent? How is it being used here? What other libraries are available that could be used for the same purpose?
+  // Superagent is an AJAX api that will allow us to work with the google books api key that we retrieved and set earlier. It allows us to continually ping the google books api and stay connected with it so that we can pull the results from our search and utilize them in our page. jQuery is another library that we've used for the same purpose, but there are other competing libraries out there, such as Axios and Fetch API.
   superagent.get(url)
     .query({'q': query})
     .query({'key': API_KEY})
     .then(response => response.body.items.map((book, idx) => {
 
-      // COMMENT: The line below is an example of destructuring. Explain destructuring in your own words.
+      // DONE: Destructuring is when the program takes properties from an object and unpacks them into their own variables.
       let { title, authors, industryIdentifiers, imageLinks, description } = book.volumeInfo;
 
-      // COMMENT: What is the purpose of the following placeholder image?
+      // DONE:If there is a missing image in the book API found, it replaces the image display.
       let placeholderImage = 'http://www.newyorkpaddy.com/images/covers/NoCoverAvailable.jpg';
 
-      // COMMENT: Explain how ternary operators are being used below.
+      // DONE: If the field does exist, use it, else use a default value for it.
       return {
         title: title ? title : 'No title available',
         author: authors ? authors[0] : 'No authors available',
@@ -61,7 +64,8 @@ app.get('/api/v1/books/find', (req, res) => {
     .catch(console.error)
 })
 
-// COMMENT: How does this route differ from the route above? What does ':isbn' refer to in the code below?
+// DONE: This route is intended for use when we need a specific volume of a book. :isbn refers to the isbn inside the request. While many volumes can share the same title, author, etc, searching by a specific isbn will return a specific volume that we are requesting.
+//How does this route differ from the route above? What does ':isbn' refer to in the code below?
 app.get('/api/v1/books/find/:isbn', (req, res) => {
   let url = 'https://www.googleapis.com/books/v1/volumes';
   superagent.get(url)
